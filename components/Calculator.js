@@ -8,7 +8,8 @@ const Calculator = () => {
     custom: '',
   });
   const [tip, setTip] = useState();
-  const [tipForPer, setTipForPer] = useState()
+  const [tipForPer, setTipForPer] = useState();
+  const [total, setTotal ] = useState();
 
 
   console.log('Bill:', data.bill)
@@ -35,8 +36,10 @@ const Calculator = () => {
     e.preventDefault();
     if (data.custom) {
       setTipForPer((data.bill * (data.custom / 100)) / data.numberOfPeople)
+      setTotal(data.bill * (data.custom / 100))
     } else {
       setTipForPer((data.bill * (tip / 100)) / data.numberOfPeople)
+      setTotal(data.bill * (tip / 100))
     }
     console.log(tipForPer)
     setData(prev => ({
@@ -135,7 +138,7 @@ const Calculator = () => {
               <b className="body-text card-price-title">Total</b>
               <p className="body-s-text card-price-subtitle">/ person</p>
             </div>
-            <strong className="strong-text card-price-value" id="totalPrice">$0.00</strong>
+            <strong className="strong-text card-price-value" id="totalPrice">${total ? total : '0.00'}</strong>
           </section>
           <button className="btn btn-primary btn-reset">Reset</button>
         </div>
