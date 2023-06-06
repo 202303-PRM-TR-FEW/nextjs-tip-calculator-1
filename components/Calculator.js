@@ -7,9 +7,9 @@ const Calculator = () => {
     numberOfPeople: '',
     custom: '',
   });
-  const [tip, setTip] = useState();
-  const [tipForPer, setTipForPer] = useState();
-  const [total, setTotal ] = useState();
+  const [tip, setTip] = useState('');
+  const [tipForPer, setTipForPer] = useState('');
+  const [total, setTotal ] = useState('');
 
 
   console.log('Bill:', data.bill)
@@ -31,15 +31,19 @@ const Calculator = () => {
 
   }
 
+  const handleReset = () => {
+    setTotal('');
+    setTipForPer('');
+  }
 
   const handleTipSubmit = e => {
     e.preventDefault();
     if (data.custom) {
-      setTipForPer((data.bill * (data.custom / 100)) / data.numberOfPeople)
-      setTotal(data.bill * (data.custom / 100))
+      setTipForPer(String((data.bill * (data.custom / 100)) / data.numberOfPeople).slice(0,3))
+      setTotal(String(data.bill * (data.custom / 100)).slice(0,3))
     } else {
-      setTipForPer((data.bill * (tip / 100)) / data.numberOfPeople)
-      setTotal(data.bill * (tip / 100))
+      setTipForPer(String((data.bill * (tip / 100)) / data.numberOfPeople).slice(0,3))
+      setTotal(String(data.bill * (tip / 100)).slice(0,3))
     }
     console.log(tipForPer)
     setData(prev => ({
@@ -51,7 +55,8 @@ const Calculator = () => {
   }
 
 
-
+  const name = 'medet'
+  console.log(name.length, '----')
 
 
   return (
@@ -131,7 +136,7 @@ const Calculator = () => {
               <b className="body-text card-price-title">Tip Amount</b>
               <p className="body-s-text card-price-subtitle">/ person</p>
             </div>
-            <strong className="strong-text card-price-value" id="tipAmount">${tipForPer ? tipForPer : '0.00'}</strong>
+            <strong className="strong-text card-price-value" id="tipAmount">${tipForPer.length > 1 ? tipForPer : '0.00'}</strong>
           </section>
           <section className="card-price-container">
             <div>
@@ -140,7 +145,7 @@ const Calculator = () => {
             </div>
             <strong className="strong-text card-price-value" id="totalPrice">${total ? total : '0.00'}</strong>
           </section>
-          <button className="btn btn-primary btn-reset">Reset</button>
+          <button onClick={handleReset} className="btn btn-primary btn-reset">Reset</button>
         </div>
       </section>
     </main>
