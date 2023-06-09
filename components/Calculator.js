@@ -2,62 +2,83 @@ import { useState } from 'react';
 
 const Calculator = () => {
   // TODO: start coding here!
+  const [isError, setIsError] = useState(false)
   const [data, setData] = useState({
-    bill: '',
-    numberOfPeople: '',
-    custom: '',
+    bill: 0,
+    numberOfPeople: 1,
+    custom: 0,
+    tip: 0
   });
-  const [tip, setTip] = useState('');
-  const [tipForPer, setTipForPer] = useState('');
-  const [total, setTotal ] = useState('');
-
+  const [tipForPer, setTipForPer] = useState(0);
+  const [total, setTotal] = useState(0);
 
   console.log('Bill:', data.bill)
   console.log('numberOfPeople:', data.numberOfPeople)
   console.log('custom:', data.custom)
-  console.log('Tip:', tip)
+  console.log('Tip:', data.tip)
 
   const handleChange = e => {
     const { name, value } = e.target;
     setData(prev => ({
       ...prev,
-      [name]: value
+      [name]: Number(value)
     }))
+
+    if (name === 'numberOfPeople') {
+      if (value < 1) {
+        setIsError(true)
+      } else {
+        setIsError(false)
+      }
+    } else if (name === 'bill') {
+      if (value < 1) {
+        setIsError(true)
+      } else {
+        setIsError(false)
+      }
+    }
+
   }
 
   const handleClick = e => {
-    const tipValue = e.target.textContent.replace('%', '');
-    setTip(tipValue)
-
+    const { name, value } = e.target
+    setData(prev => ({
+      ...prev,
+      [name]: Number(value)
+    }))
   }
 
   const handleReset = () => {
-    setTotal('');
-    setTipForPer('');
+    setTotal(0);
+    setTipForPer(0);
+    setData(prev => ({
+      ...prev,
+      bill: 0,
+      numberOfPeople: 1,
+      custom: 0,
+      tip: 0
+    }))
   }
 
   const handleTipSubmit = e => {
     e.preventDefault();
+    let total = (data.bill + (data.bill * (data.custom / 100))) / data.numberOfPeople;
+    let tipForPer = (data.bill * (data.custom / 100)) / data.numberOfPeople
+    let total2 = (data.bill + (data.bill * (data.tip / 100))) / data.numberOfPeople;
+    let tipForPer2 = (data.bill * (data.tip / 100)) / data.numberOfPeople
+
     if (data.custom) {
-      setTipForPer(String((data.bill * (data.custom / 100)) / data.numberOfPeople).slice(0,3))
-      setTotal(String(data.bill * (data.custom / 100)).slice(0,3))
-    } else {
-      setTipForPer(String((data.bill * (tip / 100)) / data.numberOfPeople).slice(0,3))
-      setTotal(String(data.bill * (tip / 100)).slice(0,3))
+      setTipForPer(tipForPer)
+      setTotal(total)
+      setData(prev => ({
+        ...prev,
+        'tip': 0
+      }))
+    } else if (data.tip) {
+      setTipForPer(tipForPer2)
+      setTotal(total2)
     }
-    console.log(tipForPer)
-    setData(prev => ({
-      ...prev,
-      bill: '',
-      numberOfPeople: '',
-      custom: '',
-    }))
   }
-
-
-  const name = 'medet'
-  console.log(name.length, '----')
-
 
   return (
     <main>
@@ -78,7 +99,7 @@ const Calculator = () => {
                 value={data.bill}
                 onChange={handleChange}
                 type="number"
-                className="body-l-text input-field"
+                className={`body-l-text input-field ${isError && `focus:border-2 focus:border-red-600`}`}
                 placeholder="0"
                 name="bill"
                 id="totalBill"
@@ -92,22 +113,28 @@ const Calculator = () => {
               <small className="body-text input-error" id="totalTipPercentageError">Input field is
                 valid</small>
             </div>
-            <div onSubmit={handleTipSubmit} className="input-tips-container">
-              <button
+            <form onSubmit={handleTipSubmit} className="input-tips-container">
+              <input type='submit'
+                name='tip'
+                value={5}
                 onClick={handleClick}
-                className="body-l-text input-tip" id="tip5">5%
-              </button>
-              <button onClick={handleClick} className="body-l-text input-tip" id="tip10">10%
-              </button>
-              <button onClick={handleClick} className="body-l-text input-tip" id="tip15">15%
-              </button>
-              <button onClick={handleClick} className="body-l-text input-tip" id="tip25">25%
-              </button>
-              <button onClick={handleClick} className="body-l-text input-tip" id="tip50">50%
-              </button>
-              <input name='custom' value={data.custom} onChange={handleChange} type="number" className="body-l-text input-field" placeholder="Custom"
+                className="body-l-text input-tip" id="tip5">
+              </input>
+              <input type='submit' name='tip'
+                value={10} onClick={handleClick} className="body-l-text input-tip" id="tip10">
+              </input>
+              <input type='submit' name='tip'
+                value={15} onClick={handleClick} className="body-l-text input-tip" id="tip15">
+              </input>
+              <input type='submit' name='tip'
+                value={25} onClick={handleClick} className="body-l-text input-tip" id="tip25">
+              </input>
+              <input type='submit' name='tip'
+                value={50} onClick={handleClick} className="body-l-text input-tip" id="tip50">
+              </input>
+              <input name='custom' value={data.custom} onChange={handleChange} type="number" className="biody-l-text input-field" placeholder="Custom"
                 id="totalTipPercentage"></input>
-            </div>
+            </form>
           </div>
 
           <div className="input-group" id="numberOfPeopleGroup">
@@ -122,10 +149,9 @@ const Calculator = () => {
                 name='numberOfPeople'
                 value={data.numberOfPeople}
                 type="number"
-                className="body-l-text input-field"
+                className={`body-l-text input-field ${isError && `focus:border-2 focus:border-red-600`}`}
                 placeholder="0"
                 id="numberOfPeople"
-
               />
             </form>
           </div>
@@ -136,14 +162,18 @@ const Calculator = () => {
               <b className="body-text card-price-title">Tip Amount</b>
               <p className="body-s-text card-price-subtitle">/ person</p>
             </div>
-            <strong className="strong-text card-price-value" id="tipAmount">${tipForPer.length > 1 ? tipForPer : '0.00'}</strong>
+            <strong className="strong-text card-price-value" id="tipAmount">
+              {tipForPer ? `$${tipForPer.toFixed(2)}` : '$0.00'}
+            </strong>
           </section>
           <section className="card-price-container">
             <div>
               <b className="body-text card-price-title">Total</b>
               <p className="body-s-text card-price-subtitle">/ person</p>
             </div>
-            <strong className="strong-text card-price-value" id="totalPrice">${total ? total : '0.00'}</strong>
+            <strong className="strong-text card-price-value" id="totalPrice">
+              {total ? `$${total.toFixed(2)}` : '$0.00'}
+            </strong>
           </section>
           <button onClick={handleReset} className="btn btn-primary btn-reset">Reset</button>
         </div>
